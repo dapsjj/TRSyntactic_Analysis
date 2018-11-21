@@ -1,0 +1,27 @@
+import paramiko
+import csv
+# 创建SSH对象
+ssh = paramiko.SSHClient()
+# 允许连接不在know_hosts文件中的主机
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+# 连接服务器
+ssh.connect(hostname='1.1.1.6', port=22, username='11', password='22')
+text = 'いい天気ですね'
+top_list=[]
+# 执行命令
+cmd = " echo " + text + " |juman | knp "
+# cmd = " echo " + text + " |juman | knp -tab "
+stdin, stdout, stderr = ssh.exec_command(cmd)
+# 获取命令结果
+byteResult = stdout.read()
+# strResult = byteResult.decode('utf-8',errors='replace').split('\n')#byte to str
+strResult = byteResult.decode('utf-8').split('\n')#byte to str
+for line in strResult:
+    if (line == "EOS"):
+        break
+    top_list.append([line])
+with open(r'D:/knpTree.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f)
+    writer.writerows(top_list)
+# 关闭连接
+ssh.close()
